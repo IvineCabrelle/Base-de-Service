@@ -1,0 +1,6 @@
+notes poc sur  le laboratoire
+
+les modificatIONS SUR 1.2
+lorsque qu'on affiche A DONT SUR LE 8 L.ALARME S'ALLUME 
+LORSQUON AFFICHE SUR N'IMPORTE QUEL BUTTON L.ALLERDE FLAGE ET LE 8 DONNE LA LUMIERE
+NB:On doit remettre le travail

@@ -1,0 +1,75 @@
+Exercice de Base de Service
+
+-Création de la table école
+CREATE TABLE ecole
+(
+    id INT id_Etudiant PRIMARY KEY NOT NULL,
+    nom_Etudiant VARCHAR(100),
+    cours VARCHAR(100),
+    professeur VARCHAR(255),
+    salle VARCHAR(255),
+    Note INT
+)
+-Assurer les enregistrements uniques
+
+****** La classe Etudiant******
+Create table Etudiant
+(
+  id INT id_Etudiant PRIMARY KEY NOT NULL,
+ nom_Etudiant VARCHAR(100),
+	
+)
+****** La classe Cours******
+Create table Cours
+(
+  id INT id_Cours PRIMARY KEY NOT NULL,
+ cours VARCHAR(100),
+   professeur VARCHAR(255),
+    salle VARCHAR(255),
+	
+)
+****** La classe note******
+CREATE TABLE note (
+  id INT id_Etudiant PRIMARY KEY NOT NULL,
+  note VARCHAR(100),
+  id_cours INT,
+  FOREIGN KEY (id_etudiant) REFERENCES etudiant(id),
+  FOREIGN KEY (id_cours) REFERENCES cours(id)
+);
+
+********. Ajoutez un étudiant nommé "David" avec l'ID 4.**********
+INSERT INTO Etudiant (Id-Etudiant, Nom_Etudiant) VALUES (4, 'David');
+
+******inscrivez l'étudiant "David" au cours "Mathématiques" avec une note de 95.****
+INSERT INTO note (id_Etudiant, note, id_cours) VALUES (4, 1, 100); 
+
+****** Affichez tous les étudiants inscrits.**********
+
+SELECT * FROM Etudiants;
+
+******* Affichez toutes les inscriptions avec les noms des étudiants et des cours.********
+SELECT Etudiant.nom_Etudiant, Cours.cours
+FROM Etudiant
+JOIN note ON Etudiant.id = note.id_etudiant
+JOIN Cours ON note.id_cours = Cours.id;
+
+*******Changer la note de david ******
+UPDATE students
+SET note = 97
+WHERE cours = 'Mathématiques'
+AND nom_Etudiant = 'David';
+
+******Changez le nom du cours "Science" en "Physique".
+12. Supprimez l'inscription de "Bob" au cours "Histoire".
+13. Supprimez l'étudiant "Charlie" et toutes ses inscriptions
+***************************************************
+UPDATE Cours
+SET cours = 'Physique'
+WHERE cours = 'Science';
+***********************************************************************
+DELETE FROM note
+WHERE id IN (SELECT id FROM Etudiant WHERE nom_Etudiant = 'Bob')
+AND id_cours IN (SELECT id FROM Cours WHERE cours = 'Histoire');
+***********************************************************************
+DELETE FROM Etudiant
+WHERE nom_Etudiant = 'Charlie';

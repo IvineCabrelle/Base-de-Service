@@ -1,0 +1,165 @@
+Exercice11 base de service
+ use gestion_voyage
+switched to db gestion_voyage
+gestion_voyage> db.createCollection("Destinations")
+{ ok: 1 }
+gestion_voyage> db.createCollection("Voyages")
+{ ok: 1 }
+gestion_voyage> db.createCollection("Clients")
+{ ok: 1 }
+gestion_voyage> db.createCollection("Factures")
+{ ok: 1 }
+gestion_voyage> db.Destinations.insertMany([{nom:"Cameroun",Description:"Pays de reve", prix:"1000",attraction:"nourriture"}])
+{
+  acknowledged: true,
+  insertedIds: { '0': ObjectId('666ca5b6576319344c90df1c') }
+}
+gestion_voyage> db.Destinations.insertMany([{nom:"Canada",Description:"plein de beau instrument", prix:"1500",attraction:"tourisme"}])
+{
+  acknowledged: true,
+  insertedIds: { '0': ObjectId('666ca5d7576319344c90df1d') }
+}
+gestion_voyage> db.Voyages.insertMany([{Destination:"Canada",Date:"15-02-2025", date_retour:"15-06-2025",Liste:"2", prix:"2500"}])
+{
+  acknowledged: true,
+  insertedIds: { '0': ObjectId('666ca63e576319344c90df1e') }
+}
+gestion_voyage> db.Voyages.insertMany([{Destination:"Maroc",Date:"15-02-2023", date_retour:"15-06-2026",Liste:"3", prix:"3000"}])
+{
+  acknowledged: true,
+  insertedIds: { '0': ObjectId('666ca65b576319344c90df1f') }
+}
+db.Clients.insertMany([{nom:"Maroc",Email:"Ivine@gmail.com", numero:"4386800066"}])
+{
+  acknowledged: true,
+  insertedIds: { '0': ObjectId('666ca70e576319344c90df20') }
+}
+gestion_voyage> db.Clients.insertMany([{nom:"Maroc",Email:"Ivine@gmail.com", numero:"4386800062"}])
+{
+  acknowledged: true,
+  insertedIds: { '0': ObjectId('666ca712576319344c90df21') }
+}
+gestion_voyage> db.Factures.insertMany([{numero:"48563217",id:"666ca63e576319344c90df1e", montant:"40000", date:"02/02/24"}])
+{
+  acknowledged: true,
+  insertedIds: { '0': ObjectId('666ca78a576319344c90df22') }
+}
+gestion_voyage> db.Factures.insertMany([{numero:"48563217",id:"666ca65b576319344c90df1f", montant:"45000", date:"02/02/25"}])
+{
+  acknowledged: true,
+  insertedIds: { '0': ObjectId('666ca7b4576319344c90df23') }
+}
+gestion_voyage> db.Destinations.find()
+[
+  {
+    _id: ObjectId('666ca5b6576319344c90df1c'),
+    nom: 'Cameroun',
+    Description: 'Pays de reve',
+    prix: '1000',
+    attraction: 'nourriture'
+  },
+  {
+    _id: ObjectId('666ca5d7576319344c90df1d'),
+    nom: 'Canada',
+    Description: 'plein de beau instrument',
+    prix: '1500',
+    attraction: 'tourisme'
+  }
+]
+gestion_voyage> db.Voyages.find()
+[
+  {
+    _id: ObjectId('666ca63e576319344c90df1e'),
+    Destination: 'Canada',
+    Date: '15-02-2025',
+    date_retour: '15-06-2025',
+    Liste: '2',
+    prix: '2500'
+  },
+  {
+    _id: ObjectId('666ca65b576319344c90df1f'),
+    Destination: 'Maroc',
+    Date: '15-02-2023',
+    date_retour: '15-06-2026',
+    Liste: '3',
+    prix: '3000'
+  }
+]
+gestion_voyage> voyage_canada = db.Voyages.find_one({"Destination": "Canada"})
+gestion_voyage>
+(To exit, press Ctrl+C again or Ctrl+D or type .exit)
+gestion_voyage> db.Voyages.updateOne(
+...    { Destination: "Canada" },
+...    {
+...      $set: { date_retour: "30-06-2025" }
+...    }
+... )
+{
+  acknowledged: true,
+  insertedId: null,
+  matchedCount: 1,
+  modifiedCount: 1,
+  upsertedCount: 0
+}
+gestion_voyage> db.Factures.find()
+[
+  {
+    _id: ObjectId('666ca78a576319344c90df22'),
+    numero: '48563217',
+    id: '666ca63e576319344c90df1e',
+    montant: '40000',
+    date: '02/02/24'
+  },
+  {
+    _id: ObjectId('666ca7b4576319344c90df23'),
+    numero: '48563217',
+    id: '666ca65b576319344c90df1f',
+    montant: '45000',
+    date: '02/02/25'
+  }
+]
+gestion_voyage> db.Factures.aggregate([
+...   {
+...     $match: {
+...       date: {
+...         $gte: '02/02/24',
+...         $lte: '02/02/25'
+...       }
+...     }
+...   },
+...   {
+...     $group: {
+...       _id: null,
+...       total: {
+...         $sum: { $toInt: "$montant" }
+...       }
+...     }
+...   }
+... ])
+[ { _id: null, total: 85000 } ]
+gestion_voyage> db.Clients.find()
+[
+  {
+    _id: ObjectId('666ca70e576319344c90df20'),
+    nom: 'Maroc',
+    Email: 'Ivine@gmail.com',
+    numero: '4386800066'
+  },
+  {
+    _id: ObjectId('666ca712576319344c90df21'),
+    nom: 'Maroc',
+    Email: 'Ivine@gmail.com',
+    numero: '4386800062'
+  }
+]
+
+
+DELETE FROM Factures WHERE id IN (SELECT _id FROM Factures WHERE id = '666ca63e576319344c90df1e' OR id = '666ca65b576319344c90df1f'); 
+DELETE FROM Clients
+WHERE numero = '4386800066';
+
+
+
+denormalisation: 
+
+db.Destinations.aggregate([ { $lookup: {  from: "Voyages",  localField: "id", foreignField: "id",  as: "Voyages_destinations"  } }, { $unwind: "$Voyages_destinations" }, { $project: { _id: 0, nom: 1,  Description: 1,  prix: 1,  "Voyages_destinations.Destination": 1, "Voyages_destinations.Date": 1, "Voyages_destinations.date_retour": 1,"Voyages_destinations.Liste": 1,"Voyages_destinations.prix": 1, } }, { $out: "Voyages_destinations_denormalises" }] )

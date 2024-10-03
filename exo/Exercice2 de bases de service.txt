@@ -1,0 +1,72 @@
+Exercice2 de bases de service
+************Création de la table Clients**********
+Create table Clients
+(
+  id INT id_Clients PRIMARY KEY NOT NULL,
+ Nom_Client VARCHAR(100),
+ Adresse_Client VARCHAR(100),
+	
+);
+****************************************************************************************************************************************************************************************
+************Création de la table Voiture**********
+Create table Voiture
+(
+  id INT iD_Voiture PRIMARY KEY NOT NULL,
+ Marque VARCHAR(100),
+Modele VARCHAR(100),
+INT Annee,
+Couleur VARCHAR(100),
+INT Prix,
+	
+);
+*************************************************************************************************************************************************************************************
+
+********Création de ventes********
+create table ventes(
+id INT iD_Vente PRIMARY KEY NOT NULL,
+INT id_Clients,
+DateTime Date_vente,
+ INT iD_Voiture,
+FOREIGN KEY (id_clients) REFERENCES Clients(id_clients),
+  FOREIGN KEY (iD_Voiture) REFERENCES Voiture (iD_Voiture)
+);
+****************************************************************************************************************************************************************************************
+******** Ajoutez un client nommé "David" avec l'ID 4 et l'adresse "321 Rue D"***********
+INSERT INTO Clients (Id_Clients, Adresse_Client) VALUES (4, '321 Rue D');
+********************************************************************************************************************************************************************************************
+********* Ajoutez une vente pour le client "David" de la voiture "Toyota Corolla" le 2023-05-15.***********
+
+INSERT INTO ventes (iD_Vente, id_Clients, Date_vente, iD_Voiture) 
+VALUES (4, 4, '2023-05-15', (SELECT iD_Voiture FROM Voiture WHERE Marque = 'Toyota' AND Modele = 'Corolla'));
+******************************************************************************************************************************************************************************************
+********* Affichez tous les clients inscrits***************
+
+Select * FROM CLIENTS
+******************************************************************************************************************************************************************************************
+*******Affichez toutes les ventes avec les noms des clients et les détails des voitures.******************
+SELECT ventes.id AS Vente_ID, Clients.Nom_Client, Voiture.Marque, Voiture.Modele, ventes.Date_vente
+FROM ventes
+JOIN Clients ON ventes.id_Clients = Clients.id
+JOIN Voiture ON ventes.id_Voiture = Voiture.id;
+*****************************************************************************************************************************************************************************************
+******** Changez l'adresse de "Bob" en "456 Rue B2".**************
+UPDATE Clients
+SET Adresse_Client = '456 Rue B2'
+WHERE Nom_Client = 'Bob';
+****************************************************************************************************************************************************************************************
+**********. Changez le prix de la "Toyota Corolla" à 20500.*********
+UPDATE Voiture
+SET Prix = 20500
+WHERE Marque = 'Toyota' AND Modele = 'Corolla';
+***************************************************************************************************************************************************************************************
+*********Supprimez la vente de "Charlie" pour la voiture "Ford Fiesta".**********
+DELETE FROM ventes
+WHERE id_Clients = (SELECT id_Clients FROM Clients WHERE Nom_Client = 'Charlie')
+AND id_Voiture = (SELECT iD_Voiture FROM Voiture WHERE Marque = 'Ford' AND Modele = 'Fiesta');
+***************************************************************************************************************************************************************************************
+***************. Supprimez le client "Alice" et toutes ses ventes.************
+DELETE FROM Clients
+WHERE Nom_Client = 'Alice';
+
+DELETE FROM ventes
+WHERE id_Clients = (SELECT id_Clients FROM Clients WHERE Nom_Client = 'Alice');

@@ -1,0 +1,70 @@
+Exrecice 10 base de service  
+use  telephones_db
+switched to db telephones_db
+telephones_db> db.createCollection("Marques")
+{ ok: 1 }
+telephones_db> db.createCollection("telephones")
+{ ok: 1 }
+telephones_db> db.telephone.insertMany([{marque_id:"1",modele:"Motorolla", prix:"20",caracteristiques:"Bien a tous les niveaux"}])
+{
+  acknowledged: true,
+  insertedIds: { '0': ObjectId('666c982c576319344c90df0c') }
+}
+telephones_db> db.telephone.insertMany([{marque_id:"2",modele:"Techno", prix:"40",caracteristiques:"Bien a tous les niveaux"}])
+{
+  acknowledged: true,
+  insertedIds: { '0': ObjectId('666c9843576319344c90df0d') }
+}
+telephones_db> db.telephone.insertMany([{marque_id:"3",modele:"Iphone", prix:"80",caracteristiques:"Bien a tous les niveaux"}])
+{
+  acknowledged: true,
+  insertedIds: { '0': ObjectId('666c985d576319344c90df0e') }
+}
+telephones_db> db.telephone.insertMany([{marque_id:"4",modele:"Samsung", prix:"100",caracteristiques:"Bien a tous les niveaux"}])
+{
+  acknowledged: true,
+  insertedIds: { '0': ObjectId('666c9872576319344c90df0f') }
+}
+telephones_db> db.Marques.insertMany([{marque_id:"2",nom:"Indienna",Pays_origine:"Cameroun", annee_creation:"2022"}])
+{
+  acknowledged: true,
+  insertedIds: { '0': ObjectId('666ca193576319344c90df18') }
+}
+telephones_db> db.Marques.insertMany([{marque_id:"3",nom:"Techno",Pays_origine:"Gabon", annee_creation:"2024"}])
+{
+  acknowledged: true,
+  insertedIds: { '0': ObjectId('666ca1a4576319344c90df19') }
+}
+telephones_db> db.Marques.insertMany([{marque_id:"4",nom:"Alonso",Pays_origine:"Chine", annee_creation:"2012"}])
+{
+  acknowledged: true,
+  insertedIds: { '0': ObjectId('666ca1b0576319344c90df1a') }
+}
+telephones_db> db.Marques.insertMany([{marque_id:"1",nom:"Linux",Pays_origine:"Canada", annee_creation:"2023"}])
+{
+  acknowledged: true,
+  insertedIds: { '0': ObjectId('666ca1bf576319344c90df1b') }
+
+
+db.telephone.aggregate([ 
+{ 
+$lookup: { 		
+from: "Marques",  
+localField: "marque_id",
+foreignField: "marque_id",
+as: "Marque_telephone"
+ } }
+, 
+{ $unwind: "$Marque_telephone" }, 
+{ $project: 
+{ _id: 0,
+ modele: 1, 
+prix: 1,
+caracteristiques: 1,
+"Marque_telephone.nom": 1, 
+"Marque_telephone.Pays_origine": 1, 
+"Marque_telephone.annee_creation": 1 } },
+ { $out: "telephones_denormalises"}
+]
+ ) 
+db.telephones_denormalises.find().pretty()
